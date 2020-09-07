@@ -1,7 +1,7 @@
 import random
 import string
 from collections import OrderedDict
-import numpy as np
+# import numpy as np
 
 # menghapus tanda baca dan spasi, serta membuat text menjadi huruf kecil
 # input : Text
@@ -117,7 +117,6 @@ def bigram(text):
     text = text.replace("j", "i")
     text = text.upper()
     bigramList = []
-    j = 0
     for i in range(len(text)):
         if (i > 0) and (i % 2 == 1):
             continue
