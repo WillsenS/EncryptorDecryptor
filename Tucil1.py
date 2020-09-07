@@ -1,7 +1,7 @@
 import random
 import string
 from collections import OrderedDict
-# import numpy as np
+import numpy as np
 
 # menghapus tanda baca dan spasi, serta membuat text menjadi huruf kecil
 # input : Text
@@ -174,15 +174,32 @@ def PlayfairC(text,key):
     NewText = ""
     NewText = NewText.join(bigramList)
     print(PlayfairEncrypt(table,NewText))
-    
-# def SuperEncrypt(text, key):
-#     FirstEncrypt = VigenereEncrypt(text,key)
-#     FirstEncrypt = ArrangeText(FirstEncrypt.lower())
-#     if (len(FirstEncrypt) % 2) == 1 :
-#         FirstEncrypt += "z"
-#     matrix = []
-#     for i in range(len(FirstEncrypt) // 2):
-#         temp = list()
+
+# Super Encrypt
+# Dengan enkripsi vigenere basic dan transpose matrix dengan 2 kolom
+# input: text,key
+# output: text terenkripsi (upper case)  
+def SuperEncrypt(text, key):
+    FirstEncrypt = VigenereEncrypt(text,key)
+    FirstEncrypt = ArrangeText(FirstEncrypt.lower())
+    if (len(FirstEncrypt) % 2) == 1 :
+        FirstEncrypt += "z"
+    print("firstencrypt : " + FirstEncrypt)
+    matrix = []
+    j = 0
+    for i in range(len(FirstEncrypt) // 2):
+        TempArray = [FirstEncrypt[j],FirstEncrypt[j+1]]
+        matrix.append(TempArray)
+        j += 2
+    numpyArray = np.array(matrix)
+    numpyTranspose = numpyArray.T
+    TransposeMatrix = numpyTranspose.tolist()
+    print(TransposeMatrix)
+    Encrypted = ""
+    for i in range(2):
+        for j in TransposeMatrix[i]:
+            Encrypted += j
+    return Encrypted.upper()
     
 
 
@@ -227,4 +244,4 @@ if (pilihan == "5"):
 if (pilihan == "6"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
-    print("Terenkripsi : " + VigenereEncrypt(text,key))
+    print(SuperEncrypt(text,key))
