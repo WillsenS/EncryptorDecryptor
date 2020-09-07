@@ -154,6 +154,8 @@ def findPosition(table,text):
             return (table.index(i), i.index(text))
 
 # Enkripsi Playfair
+# input: table, string bigram
+# output: list of bigram
 def PlayfairEncrypt(table,bigram):
     NewBigram = []
     for i in range(len(bigram) // 2):
@@ -170,8 +172,33 @@ def PlayfairEncrypt(table,bigram):
             NewBigram.append(temp)
     return NewBigram
 
-# inisialisasi playfair
-def PlayfairC(text,key):
+
+# Dekripsi Playfair menjadi bigram
+# input: table, text
+# output: text
+def PlayfairDecrypt(table,text):
+    bigram = ""
+    bigram = bigram.join(text)
+    NewBigram = []
+    for i in range(len(bigram) // 2):
+        pos1 = findPosition(table,bigram[i*2])
+        pos2 = findPosition(table,bigram[i*2 + 1])
+        if pos1[0] == pos2[0]:
+            temp = table[pos1[0]][(pos1[1] + 4) % 5] + table[pos2[0]][(pos2[1] + 4) % 5]
+            NewBigram.append(temp)
+        elif pos1[1] == pos2[1]:
+            temp = table[(pos1[0] + 4) % 5][pos1[1]] + table[(pos2[0] + 4) % 5][pos2[1]]
+            NewBigram.append(temp)
+        else:
+            temp = table[(pos1[0])][pos2[1]] + table[(pos2[0])][pos1[1]]
+            NewBigram.append(temp)
+    decrypt = ""
+    decrypt = decrypt.join(NewBigram)
+    decrypt = decrypt.replace("X","")
+    return(decrypt.lower())
+
+# Mengenerate playfair table
+def playfairTable(text,key):
     text= text.upper()
     key = key.lower()
     MagicKey = "abcdefghijklmnopqrstuvwxyz"
@@ -186,10 +213,15 @@ def PlayfairC(text,key):
         for j in range (5):
             data.append(NewKey[i*5 + j])
         table.append(data)
+    return table
+
+# inisialisasi playfair
+# return bigram encrypted
+def PlayfairC(table,text,key):
     bigramList = bigram(text)
     NewText = ""
     NewText = NewText.join(bigramList)
-    print(PlayfairEncrypt(table,NewText))
+    return(PlayfairEncrypt(table,NewText))
 
 # Super Encrypt
 # Dengan enkripsi vigenere basic dan transpose matrix dengan 2 kolom
@@ -255,7 +287,11 @@ if (pilihan == "4"):
 if (pilihan == "5"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
-    PlayfairC(text,key)
+    table = playfairTable(text,key)
+    print("encrypted : " ,end ="")
+    print(PlayfairC(table,text,key))
+    print(PlayfairDecrypt(table, PlayfairC(table,text,key)))
+
 
 if (pilihan == "6"):
     text = input("Masukan Teks: ")
