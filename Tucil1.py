@@ -16,6 +16,8 @@ def ArrangeText(text):
             newText += text[i]
     return newText
 
+#***************** BASIC VIGENERE ********************
+
 # Mengenkripsi kata dengan basic vigenere sesuai key (hanya 26 alfabet)
 # Input: text , key
 # output: Text yang terenkripsi dalam upper case
@@ -33,6 +35,24 @@ def VigenereEncrypt(text,key):
             j += 1
     return encrypted.upper()
 
+# Dekripsi Vigenere sesuai key
+# Input: text , key
+# output: Text yang terdekripsi
+def VigenereDecrypt(text,key):
+    text = text.lower()
+    key = ArrangeText(key.lower())
+    decrypted = ""
+    j = 0
+    for i in range(len(text)):
+        if (ord(text[i]) < 97) or (ord(text[i]) > 122):
+            decrypted += text[i]
+        else:
+            decrypted += chr(((ord(text[i])-97) - (ord(key[(j % len(key))]) - 97))  % 26 + 97)
+            j += 1
+    return decrypted()
+
+#**************** EXTENDED VIGENERE *************************
+
 # Mengenkripsi kata dengan extended vigenere sesuai key (256 ASCII)
 # input: text, key
 # output: text yang terenkripsi
@@ -41,6 +61,8 @@ def ExtendedVigenereEncrypt(text,key):
     for i in range(len(text)):
             encrypted += chr(((ord(text[i])) + (ord(key[(i % len(key))]))))
     return encrypted
+
+#************** AUTOKEY VIGENERE ***************************
 
 # Mengenkripsi kata dengan Auto Key Vigenere sesuai key
 # Input: text , key
@@ -64,7 +86,8 @@ def AutoKeyVigenereEncrypt(text,key):
             j += 1
     return encrypted.upper()
 
-# Dekripsi Auto Key
+# Dekripsi Auto Key Vigenere
+# Input : text, key
 # Output: String tanpa tanda baca dan spasi
 def AutoKeyVigenereDecrypt(text,key):
     text = text.lower()
@@ -79,21 +102,7 @@ def AutoKeyVigenereDecrypt(text,key):
         decrypted += temp
     return decrypted
 
-# Dektipsi Vigenere sesuai key
-# Input: text , key
-# output: Text yang terdekripsi
-def VigenereDecrypt(text,key):
-    text = text.lower()
-    key = ArrangeText(key.lower())
-    decrypted = ""
-    j = 0
-    for i in range(len(text)):
-        if (ord(text[i]) < 97) or (ord(text[i]) > 122):
-            decrypted += text[i]
-        else:
-            decrypted += chr(((ord(text[i])-97) - (ord(key[(j % len(key))]) - 97))  % 26 + 97)
-            j += 1
-    return decrypted()
+#**************** FULL VIGENERE *********************
 
 # Mengenerate sebuah Table berisi random alfabet unik dalam upper case
 # Return Table of random generated alphabet
@@ -123,6 +132,9 @@ def FullVigenereC(text,key,table):
             j += 1
     return encrypted.upper()
 
+
+#******************* PLAYFAIR CIPHER********************
+
 # Mengenerate Bigram dari text sesuai dengan aturan playfair cipher
 # Mengganti huruf J menjadi i dan menambahkan x jika duplikat/ganjil
 # Input: text
@@ -146,12 +158,15 @@ def bigram(text):
     bigramList = [(text[i:i+2]) for i in range(0, len(text), 2)]
     return bigramList
 
+
 # Mencari posisi text pada table
-# return index text
+# Input: table, char 
+# Output: index text
 def findPosition(table,text):
     for i in table:
         if text in i:
             return (table.index(i), i.index(text))
+
 
 # Enkripsi Playfair
 # input: table, string bigram
@@ -223,6 +238,9 @@ def PlayfairC(table,text,key):
     NewText = NewText.join(bigramList)
     return(PlayfairEncrypt(table,NewText))
 
+
+#******************* SUPER ENCRYPT ***********************
+
 # Super Encrypt
 # Dengan enkripsi vigenere basic dan transpose matrix dengan 2 kolom
 # input: text,key
@@ -248,7 +266,9 @@ def SuperEncrypt(text, key):
         for j in TransposeMatrix[i]:
             Encrypted += j
     return Encrypted.upper()
-    
+
+#************** MAIN PROGRAM *********************
+
 print("Welcome to encryptor")
 print("masukkan pilihan :")
 print("1. basic vigenere")
@@ -291,7 +311,6 @@ if (pilihan == "5"):
     print("encrypted : " ,end ="")
     print(PlayfairC(table,text,key))
     print(PlayfairDecrypt(table, PlayfairC(table,text,key)))
-
 
 if (pilihan == "6"):
     text = input("Masukan Teks: ")
