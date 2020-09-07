@@ -64,6 +64,21 @@ def AutoKeyVigenereEncrypt(text,key):
             j += 1
     return encrypted.upper()
 
+# Dekripsi Auto Key
+# Output: String tanpa tanda baca dan spasi
+def AutoKeyVigenereDecrypt(text,key):
+    text = text.lower()
+    text = ArrangeText(text)
+    key = ArrangeText(key.lower())
+    decrypted = ""
+    j = 0
+    for i in range(len(text)):
+        temp = ""
+        temp = chr(((ord(text[i])-97) - (ord(key[(i % len(key))]) - 97))  % 26 + 97)
+        key += temp
+        decrypted += temp
+    return decrypted
+
 # Dektipsi Vigenere sesuai key
 # Input: text , key
 # output: Text yang terdekripsi
@@ -108,7 +123,8 @@ def FullVigenereC(text,key,table):
             j += 1
     return encrypted.upper()
 
-#Mengenerate Bigram dari text sesuai dengan aturan playfair cipher
+# Mengenerate Bigram dari text sesuai dengan aturan playfair cipher
+# Mengganti huruf J menjadi i dan menambahkan x jika duplikat/ganjil
 # Input: text
 # output: List of 2 char
 def bigram(text):
@@ -201,9 +217,6 @@ def SuperEncrypt(text, key):
             Encrypted += j
     return Encrypted.upper()
     
-
-
-
 print("Welcome to encryptor")
 print("masukkan pilihan :")
 print("1. basic vigenere")
@@ -212,6 +225,7 @@ print("3. Auto key vigenere")
 print("4. Extended vigenere")
 print("5. Playfair vigenere")
 print("6. Super Encryption")
+print("7. ")
 pilihan = input("pilihan anda: ")
 
 if (pilihan == "1"):
@@ -229,7 +243,9 @@ if (pilihan == "2"):
 if (pilihan == "3"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
-    print("Terenkripsi : " + AutoKeyVigenereEncrypt(text,key))
+    enc = AutoKeyVigenereEncrypt(text,key)
+    print("Terenkripsi : " + enc)
+    print("Dekripsi : " + AutoKeyVigenereDecrypt(enc,key))
 
 if (pilihan == "4"):
     text = input("Masukan Teks: ")
