@@ -3,6 +3,9 @@ import string
 from collections import OrderedDict
 import numpy as np
 
+# menghapus tanda baca dan spasi, serta membuat text menjadi huruf kecil
+# input : Text
+# Output : Text yang sudah dibersihkan
 def ArrangeText(text):
     text.lower()
     newText = ""
@@ -13,6 +16,10 @@ def ArrangeText(text):
             newText += text[i]
     return newText
 
+# Mengenkripsi kata dengan basic vigenere sesuai key (hanya 26 alfabet)
+# Input: text , key
+# output: Text yang terenkripsi dalam upper case
+# catatan: Tanda baca beserta spasi tidak dibuang
 def VigenereEncrypt(text,key):
     text = text.lower()
     key = ArrangeText(key.lower())
@@ -26,12 +33,18 @@ def VigenereEncrypt(text,key):
             j += 1
     return encrypted.upper()
 
+# Mengenkripsi kata dengan extended vigenere sesuai key (256 ASCII)
+# input: text, key
+# output: text yang terenkripsi
 def ExtendedVigenereEncrypt(text,key):
     encrypted = ""
     for i in range(len(text)):
             encrypted += chr(((ord(text[i])) + (ord(key[(i % len(key))]))))
     return encrypted
 
+# Mengenkripsi kata dengan Auto Key Vigenere sesuai key
+# Input: text , key
+# output: Text yang terenkripsi dalam upper case
 def AutoKeyVigenereEncrypt(text,key):
     text = text.lower()
     ProcessedText = ArrangeText(text)
@@ -51,7 +64,10 @@ def AutoKeyVigenereEncrypt(text,key):
             j += 1
     return encrypted.upper()
 
-def VigenerDecrypt(text,key):
+# Dektipsi Vigenere sesuai key
+# Input: text , key
+# output: Text yang terdekripsi
+def VigenereDecrypt(text,key):
     text = text.lower()
     key = ArrangeText(key.lower())
     decrypted = ""
@@ -64,6 +80,8 @@ def VigenerDecrypt(text,key):
             j += 1
     return decrypted()
 
+# Mengenerate sebuah Table berisi random alfabet unik dalam upper case
+# Return Table of random generated alphabet
 def RNDTableGenerator():
     table = []
     for i in range (26):
@@ -72,6 +90,9 @@ def RNDTableGenerator():
         table.append(data)
     return table
 
+# Full Vigenere
+# Input: text , key, table
+# output: Text yang terenkripsi dalam upper case
 def FullVigenereC(text,key,table):
     text = text.lower()
     key = ArrangeText(key.lower())
@@ -87,6 +108,9 @@ def FullVigenereC(text,key,table):
             j += 1
     return encrypted.upper()
 
+#Mengenerate Bigram dari text sesuai dengan aturan playfair cipher
+# Input: text
+# output: List of 2 char
 def bigram(text):
     text = text.lower()
     text = ArrangeText(text)
@@ -107,11 +131,14 @@ def bigram(text):
     bigramList = [(text[i:i+2]) for i in range(0, len(text), 2)]
     return bigramList
 
+# Mencari posisi text pada table
+# return index text
 def findPosition(table,text):
     for i in table:
         if text in i:
             return (table.index(i), i.index(text))
 
+# Enkripsi Playfair
 def PlayfairEncrypt(table,bigram):
     NewBigram = []
     for i in range(len(bigram) // 2):
@@ -128,7 +155,7 @@ def PlayfairEncrypt(table,bigram):
             NewBigram.append(temp)
     return NewBigram
 
-
+# inisialisasi playfair
 def PlayfairC(text,key):
     text= text.upper()
     key = key.lower()
@@ -149,11 +176,16 @@ def PlayfairC(text,key):
     NewText = NewText.join(bigramList)
     print(PlayfairEncrypt(table,NewText))
     
-def SuperEncrypt(text, key):
-    FirstEncrypt = VigenereEncrypt(text,key)
-    FirstEncrypt = ArrangeText(FirstEncrypt.lower())
-    text = ArrangeText(text)
-    #Define matriks as len(text)
+# def SuperEncrypt(text, key):
+#     FirstEncrypt = VigenereEncrypt(text,key)
+#     FirstEncrypt = ArrangeText(FirstEncrypt.lower())
+#     if (len(FirstEncrypt) % 2) == 1 :
+#         FirstEncrypt += "z"
+#     matrix = []
+#     for i in range(len(FirstEncrypt) // 2):
+#         temp = list()
+    
+
 
 
 print("Welcome to encryptor")
