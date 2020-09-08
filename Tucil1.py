@@ -17,8 +17,9 @@ def ArrangeText(text):
     return newText
 
 def ArrangeEncription(text):
+    text = ArrangeText(text.lower())
     newText = ' '.join(text[i:i+5] for i in range(0, len(text), 5))
-    return newText
+    return newText.upper()
 
 #***************** BASIC VIGENERE ********************
 
@@ -31,7 +32,7 @@ def VigenereEncrypt(text,key):
     encrypted = ""
     for i in range(len(text)):
         encrypted += chr(((ord(text[i])-97) + (ord(key[(i % len(key))]) - 97))  % 26 + 97)
-    return encrypted.upper()
+    return ArrangeEncription(encrypted).upper()
 
 # Dekripsi Vigenere sesuai key
 # Input: text , key
@@ -83,7 +84,7 @@ def AutoKeyVigenereEncrypt(text,key):
         else:
             encrypted += chr(((ord(text[i])-97) + (ord(key[(j % len(key))]) - 97))  % 26 + 97)
             j += 1
-    return encrypted.upper()
+    return ArrangeEncription(encrypted).upper()
 
 # Dekripsi Auto Key Vigenere
 # Input : text, key
@@ -107,7 +108,7 @@ def AutoKeyVigenereDecrypt(text,key):
 # Return Table of random generated alphabet uppercase
 def RNDTableGenerator():
     table = []
-    for i in range (26):
+    for _ in range (26):
         data = list(string.ascii_uppercase)
         random.shuffle(data)
         table.append(data)
@@ -129,7 +130,7 @@ def FullVigenereC(text,key,table):
             kolom = ord(text[i]) - 97
             encrypted += table[baris][kolom]
             j += 1
-    return encrypted.upper()
+    return ArrangeEncription(encrypted).upper()
 
 # Full Vigenere Encrypt
 # Input: text , key, table
@@ -144,7 +145,6 @@ def FullVigenereDecrypt(text,key,table):
         j = 0
         while not(found):
             if(text[i].upper() == table[baris][j]):
-                kolom = j
                 found = True
             else:
                 j += 1
@@ -167,11 +167,12 @@ def bigram(text):
     for i in range(len(text)):
         if (i > 0) and (i % 2 == 1):
             continue
-        if text[i] == text[i+1]:
-            text = text[:i+1] + "X" + text[i+1:]
-            i+= 1
-        else:
-            i += 1
+        if not(i >= len(text)-1):
+            if (text[i] == text[i+1]):
+                text = text[:i+1] + "X" + text[i+1:]
+                i+= 1
+            else:
+                i += 1
     if len(text) % 2 == 1:
         text += "X"
     bigramList = [(text[i:i+2]) for i in range(0, len(text), 2)]
@@ -282,7 +283,7 @@ def SuperEncrypt(text, key):
     for i in range(2):
         for j in TransposeMatrix[i]:
             Encrypted += j
-    return Encrypted.upper()
+    return ArrangeEncription(Encrypted).upper()
 
 def Convert(string): 
     list1=[] 
@@ -331,7 +332,7 @@ def affineCipherEncrypt (text,m,b):
     Encrypted = ""
     for i in text:
         Encrypted += chr(( (m * (ord(i) - 97) + b) % 26) + 97)
-    return Encrypted.upper()
+    return ArrangeEncription(Encrypted).upper()
 
 # mencari modulus multiplication inverse
 # input: int, int
@@ -353,7 +354,6 @@ def affineCipherDecrypt (text,m,b):
     text = ArrangeText(text.lower())
     Decrypted = ""
     mInverse = modInverse(m,26)
-    print (mInverse)
     for i in text:
         Decrypted += chr( (mInverse * (ord(i) - 97 - b) % 26) + 97)
     return Decrypted
@@ -394,7 +394,7 @@ def hillCipherEncrypt(text,m,table):
         for k in range(m):
             Encrypted += chr((encTable[k] % 26) + 97)
     Encrypted = Encrypted[:len(Encrypted)-sub]
-    return Encrypted.upper()
+    return ArrangeEncription(Encrypted).upper()
 
 #Hill Decrypt
 # def hillCipherDecrypt(text,m,table):
