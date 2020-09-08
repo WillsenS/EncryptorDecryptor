@@ -111,7 +111,7 @@ def AutoKeyVigenereDecrypt(text,key):
 #**************** FULL VIGENERE *********************
 
 # Mengenerate sebuah Table berisi random alfabet unik dalam upper case
-# Return Table of random generated alphabet
+# Return Table of random generated alphabet uppercase
 def RNDTableGenerator():
     table = []
     for i in range (26):
@@ -120,7 +120,7 @@ def RNDTableGenerator():
         table.append(data)
     return table
 
-# Full Vigenere
+# Full Vigenere Encrypt
 # Input: text , key, table
 # output: Text yang terenkripsi dalam upper case
 def FullVigenereC(text,key,table):
@@ -137,6 +137,26 @@ def FullVigenereC(text,key,table):
             encrypted += table[baris][kolom]
             j += 1
     return encrypted.upper()
+
+# Full Vigenere Encrypt
+# Input: text , key, table
+# output: Text yang dekripsi
+def FullVigenereDecrypt(text,key,table):
+    text = ArrangeText(text.lower())
+    key = ArrangeText(key.lower())
+    decrypted = ""
+    for i in range(len(text)):
+        baris = ord(key[(i % len(key))]) - 97
+        found = False
+        j = 0
+        while not(found):
+            if(text[i].upper() == table[baris][j]):
+                kolom = j
+                found = True
+            else:
+                j += 1
+        decrypted += chr(j + 97)
+    return decrypted
 
 
 #******************* PLAYFAIR CIPHER********************
@@ -359,6 +379,37 @@ def hillCipherEncrypt(text,m,table):
     Encrypted = Encrypted[:len(Encrypted)-sub]
     return Encrypted.upper()
 
+#Hill Decrypt
+# def hillCipherDecrypt(text,m,table):
+#     text = ArrangeText(text.lower())
+#     m = int(m)
+#     sub = len(text) % m
+#     if (sub) == 0:
+#         pass
+#     else:
+#         for i in range (sub):
+#             text += "x"
+#     npTable = np.array(table)
+#     npTable = np.linalg.inv(npTable)
+#     found = False
+#     z = 1
+#     while not(found):
+#         if ((npTable[0][0] % 26 == 1) and (npTable[1][1] % 26 == 1) and (npTable[0][1] % 26 == 0) and (npTable[1][0] % 26 == 0)) :
+#             found = True
+#         else:
+#             npTable = z * npTable
+#             z += 1
+#     Decrypted = ""
+#     for i in range(len(text) // m):
+#         charlist = []
+#         for j in range(m):
+#             charlist.append(ord(text[i*m + j]) - 97)
+#         npCharList = np.array(charlist)
+#         encTable = npTable.dot(npCharList)
+#         for k in range(m):
+#             Decrypted += chr((int(encTable[k]) % 26) + 97)
+#     Decrypted = Decrypted[:len(Decrypted)-sub]
+#     return Decrypted
         
         
             
@@ -386,8 +437,9 @@ if (pilihan == "2"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
     table = RNDTableGenerator()
-    print(table)
-    print("Terenkripsi : " + FullVigenereC(text,key,table))
+    enc = FullVigenereC(text,key,table)
+    print("Terenkripsi : " + enc)
+    print(FullVigenereDecrypt(enc,key,table))
 
 if (pilihan == "3"):
     text = input("Masukan Teks: ")
@@ -432,4 +484,5 @@ if (pilihan == "8"):
     text = input("Masukan Teks: ")
     m = input("dimensi: " )
     table = inputMatrixKey(int(m))
-    print(hillCipherEncrypt(text,m,table))
+    enc = hillCipherEncrypt(text,m,table)
+    print(enc)
