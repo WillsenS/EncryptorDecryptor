@@ -273,6 +273,30 @@ def SuperEncrypt(text, key):
             Encrypted += j
     return Encrypted.upper()
 
+#************** AFFINE CIPHER ********************
+
+# Check if a is coprime to b
+# return boolean
+def checkCoprime (a,b):
+    if (a % 2) == 0 :
+        return False
+    else :
+        if (b % a) == 0 :
+            return False
+        else:
+            return True
+
+# Affine Encryption
+# Input: String, integer(coprime dengan 26), integer
+# output: String uppercase
+def affineCipherEncrypt (text,m,b):
+    text = ArrangeText(text.lower())
+    Encrypted = ""
+    for i in text:
+        Encrypted += chr(( (m * (ord(i) - 97) + b) % 26) + 97)
+    return Encrypted.upper()
+
+
 #************** MAIN PROGRAM *********************
 
 print("Welcome to encryptor")
@@ -283,7 +307,7 @@ print("3. Auto key vigenere")
 print("4. Extended vigenere")
 print("5. Playfair vigenere")
 print("6. Super Encryption")
-print("7. ")
+print("7. Affine")
 pilihan = input("pilihan anda: ")
 
 if (pilihan == "1"):
@@ -322,3 +346,15 @@ if (pilihan == "6"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
     print(SuperEncrypt(text,key))
+
+if (pilihan == "7"):
+    text = input("Masukan Teks: ")
+    checkKey = False
+    while not(checkKey):
+        keyA = int(input("Masukkan Key integer yang koprima dengan 26: "))
+        if checkCoprime(keyA,26):
+            checkKey = True
+        else:
+            print("tidak koprima!")
+    keyB = int(input("Masukkan Key integer ke 2: "))
+    print(affineCipherEncrypt(text,keyA,keyB))
