@@ -16,6 +16,10 @@ def ArrangeText(text):
             newText += text[i]
     return newText
 
+def ArrangeEncription(text):
+    newText = ' '.join(text[i:i+5] for i in range(0, len(text), 5))
+    return newText
+
 #***************** BASIC VIGENERE ********************
 
 # Mengenkripsi kata dengan basic vigenere sesuai key (hanya 26 alfabet)
@@ -445,6 +449,7 @@ if (pilihan == "1"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
     enc = VigenereEncrypt(text,key)
+    enc = ArrangeEncription(enc)
     print("Terenkripsi : " + enc)
     print(VigenereDecrypt(enc,key))
 
