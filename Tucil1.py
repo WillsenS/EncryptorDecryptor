@@ -32,7 +32,7 @@ def VigenereEncrypt(text,key):
     encrypted = ""
     for i in range(len(text)):
         encrypted += chr(((ord(text[i])-97) + (ord(key[(i % len(key))]) - 97))  % 26 + 97)
-    return ArrangeEncription(encrypted).upper()
+    return ArrangeEncription(encrypted)
 
 # Dekripsi Vigenere sesuai key
 # Input: text , key
@@ -84,7 +84,7 @@ def AutoKeyVigenereEncrypt(text,key):
         else:
             encrypted += chr(((ord(text[i])-97) + (ord(key[(j % len(key))]) - 97))  % 26 + 97)
             j += 1
-    return ArrangeEncription(encrypted).upper()
+    return ArrangeEncription(encrypted)
 
 # Dekripsi Auto Key Vigenere
 # Input : text, key
@@ -130,7 +130,7 @@ def FullVigenereC(text,key,table):
             kolom = ord(text[i]) - 97
             encrypted += table[baris][kolom]
             j += 1
-    return ArrangeEncription(encrypted).upper()
+    return ArrangeEncription(encrypted)
 
 # Full Vigenere Encrypt
 # Input: text , key, table
@@ -283,13 +283,17 @@ def SuperEncrypt(text, key):
     for i in range(2):
         for j in TransposeMatrix[i]:
             Encrypted += j
-    return ArrangeEncription(Encrypted).upper()
+    return ArrangeEncription(Encrypted)
 
+#Mengubah sebuah string menjadi list of char
 def Convert(string): 
     list1=[] 
     list1[:0]=string 
     return list1
 
+# Super Decrypt
+# input: text,key
+# output: text
 def SuperDecrypt(text,key):
     text = ArrangeText(text.lower())
     key = ArrangeText(key.lower())
@@ -307,7 +311,7 @@ def SuperDecrypt(text,key):
             firstEnc += i[j]
     if (firstEnc[-1].upper() == 'Z') and (not(firstEnc[-2].upper() == 'Z')):
         firstEnc = firstEnc[:-1]
-    decript = VigenereDecrypt(str(firstEnc),key)
+    decript = VigenereDecrypt(firstEnc,key)
     return decript
 
 
@@ -332,7 +336,7 @@ def affineCipherEncrypt (text,m,b):
     Encrypted = ""
     for i in text:
         Encrypted += chr(( (m * (ord(i) - 97) + b) % 26) + 97)
-    return ArrangeEncription(Encrypted).upper()
+    return ArrangeEncription(Encrypted)
 
 # mencari modulus multiplication inverse
 # input: int, int
@@ -394,7 +398,7 @@ def hillCipherEncrypt(text,m,table):
         for k in range(m):
             Encrypted += chr((encTable[k] % 26) + 97)
     Encrypted = Encrypted[:len(Encrypted)-sub]
-    return ArrangeEncription(Encrypted).upper()
+    return ArrangeEncription(Encrypted)
 
 #Hill Decrypt
 # def hillCipherDecrypt(text,m,table):
