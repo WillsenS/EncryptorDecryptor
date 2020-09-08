@@ -21,35 +21,24 @@ def ArrangeText(text):
 # Mengenkripsi kata dengan basic vigenere sesuai key (hanya 26 alfabet)
 # Input: text , key
 # output: Text yang terenkripsi dalam upper case
-# catatan: Tanda baca beserta spasi tidak dibuang
 def VigenereEncrypt(text,key):
-    text = text.lower()
+    text = ArrangeText(text.lower())
     key = ArrangeText(key.lower())
     encrypted = ""
-    j = 0
     for i in range(len(text)):
-        if (ord(text[i]) < 97) or (ord(text[i]) > 122):
-            encrypted += text[i]
-        else:
-            encrypted += chr(((ord(text[i])-97) + (ord(key[(j % len(key))]) - 97))  % 26 + 97)
-            j += 1
+        encrypted += chr(((ord(text[i])-97) + (ord(key[(i % len(key))]) - 97))  % 26 + 97)
     return encrypted.upper()
 
 # Dekripsi Vigenere sesuai key
 # Input: text , key
 # output: Text yang terdekripsi
 def VigenereDecrypt(text,key):
-    text = text.lower()
+    text = ArrangeText(text.lower())
     key = ArrangeText(key.lower())
     decrypted = ""
-    j = 0
     for i in range(len(text)):
-        if (ord(text[i]) < 97) or (ord(text[i]) > 122):
-            decrypted += text[i]
-        else:
-            decrypted += chr(((ord(text[i])-97) - (ord(key[(j % len(key))]) - 97))  % 26 + 97)
-            j += 1
-    return decrypted()
+        decrypted += chr(((ord(text[i])-97) - (ord(key[(i % len(key))]) - 97))  % 26 + 97)
+    return decrypted
 
 #**************** EXTENDED VIGENERE *************************
 
@@ -276,7 +265,6 @@ def SuperEncrypt(text, key):
     FirstEncrypt = ArrangeText(FirstEncrypt.lower())
     if (len(FirstEncrypt) % 2) == 1 :
         FirstEncrypt += "z"
-    print("firstencrypt : " + FirstEncrypt)
     matrix = []
     j = 0
     for i in range(len(FirstEncrypt) // 2):
@@ -286,12 +274,37 @@ def SuperEncrypt(text, key):
     numpyArray = np.array(matrix)
     numpyTranspose = numpyArray.T
     TransposeMatrix = numpyTranspose.tolist()
-    print(TransposeMatrix)
     Encrypted = ""
     for i in range(2):
         for j in TransposeMatrix[i]:
             Encrypted += j
     return Encrypted.upper()
+
+def Convert(string): 
+    list1=[] 
+    list1[:0]=string 
+    return list1
+
+def SuperDecrypt(text,key):
+    text = ArrangeText(text.lower())
+    key = ArrangeText(key.lower())
+    listchar = []
+    temp = text[:(len(text)//2)]
+    listchar.append(Convert(temp))
+    temp = text[(len(text)//2):]
+    listchar.append(Convert(temp))
+    listnumpy = np.array(listchar)
+    arrnp = listnumpy.T
+    TransposedList = arrnp.tolist()
+    firstEnc = ""
+    for i in TransposedList:
+        for j in range(2):
+            firstEnc += i[j]
+    if (firstEnc[-1].upper() == 'Z') and (not(firstEnc[-2].upper() == 'Z')):
+        firstEnc = firstEnc[:-1]
+    decript = VigenereDecrypt(str(firstEnc),key)
+    return decript
+
 
 #************** AFFINE CIPHER ********************
 
@@ -431,7 +444,9 @@ pilihan = input("pilihan anda: ")
 if (pilihan == "1"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
-    print("Terenkripsi : " + VigenereEncrypt(text,key))
+    enc = VigenereEncrypt(text,key)
+    print("Terenkripsi : " + enc)
+    print(VigenereDecrypt(enc,key))
 
 if (pilihan == "2"):
     text = input("Masukan Teks: ")
@@ -464,7 +479,9 @@ if (pilihan == "5"):
 if (pilihan == "6"):
     text = input("Masukan Teks: ")
     key = input("Masukkan Key: ")
-    print(SuperEncrypt(text,key))
+    enc = SuperEncrypt(text,key)
+    print(enc)
+    print(SuperDecrypt(enc,key))
 
 if (pilihan == "7"):
     text = input("Masukan Teks: ")
