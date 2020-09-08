@@ -321,6 +321,47 @@ def affineCipherDecrypt (text,m,b):
         Decrypted += chr( (mInverse * (ord(i) - 97 - b) % 26) + 97)
     return Decrypted
 
+#****************** Hill Cipher *************************
+
+# Meminta user memasukan matrix dengan dimensi m x m
+# return list of list
+def inputMatrixKey(m):
+    matrix = []
+    for i in range(m):
+        templist = []
+        for j in range(m):
+            masukan = input("masukkan matrix[" +str(i)+ "][" +str(j)+ "] : ")
+            templist.append(int(masukan))
+        matrix.append(templist)
+    return matrix
+
+# enkripsi hill cipher
+# return string upper
+def hillCipherEncrypt(text,m,table):
+    text = ArrangeText(text.lower())
+    m = int(m)
+    sub = len(text) % m
+    if (sub) == 0:
+        pass
+    else:
+        for i in range (sub):
+            text += "x"
+    npTable = np.array(table)
+    Encrypted = ""
+    for i in range(len(text) // m):
+        charlist = []
+        for j in range(m):
+            charlist.append(ord(text[i*m + j]) - 97)
+        npCharList = np.array(charlist)
+        encTable = npTable.dot(npCharList)
+        for k in range(m):
+            Encrypted += chr((encTable[k] % 26) + 97)
+    Encrypted = Encrypted[:len(Encrypted)-sub]
+    return Encrypted.upper()
+
+        
+        
+            
 
 #************** MAIN PROGRAM *********************
 
@@ -333,6 +374,7 @@ print("4. Extended vigenere")
 print("5. Playfair vigenere")
 print("6. Super Encryption")
 print("7. Affine")
+print("8. Hill")
 pilihan = input("pilihan anda: ")
 
 if (pilihan == "1"):
@@ -385,3 +427,9 @@ if (pilihan == "7"):
     enc = affineCipherEncrypt(text,keyA,keyB)
     print(enc)
     print(affineCipherDecrypt(enc,keyA,keyB))
+
+if (pilihan == "8"):
+    text = input("Masukan Teks: ")
+    m = input("dimensi: " )
+    table = inputMatrixKey(int(m))
+    print(hillCipherEncrypt(text,m,table))
