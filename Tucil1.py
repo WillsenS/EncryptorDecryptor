@@ -296,6 +296,31 @@ def affineCipherEncrypt (text,m,b):
         Encrypted += chr(( (m * (ord(i) - 97) + b) % 26) + 97)
     return Encrypted.upper()
 
+# mencari modulus multiplication inverse
+# input: int, int
+# output: int
+def modInverse(a,b):
+    i = 1
+    found = False
+    while not(found):
+        if (a*i) % b == 1:
+           found = True
+        else:
+            i += 1
+    return i
+
+# Dekripsi Affine
+# input: string text, int key(coprime dengan 26), int key
+# output: string text (lowercase)
+def affineCipherDecrypt (text,m,b):
+    text = ArrangeText(text.lower())
+    Decrypted = ""
+    mInverse = modInverse(m,26)
+    print (mInverse)
+    for i in text:
+        Decrypted += chr( (mInverse * (ord(i) - 97 - b) % 26) + 97)
+    return Decrypted
+
 
 #************** MAIN PROGRAM *********************
 
@@ -357,4 +382,6 @@ if (pilihan == "7"):
         else:
             print("tidak koprima!")
     keyB = int(input("Masukkan Key integer ke 2: "))
-    print(affineCipherEncrypt(text,keyA,keyB))
+    enc = affineCipherEncrypt(text,keyA,keyB)
+    print(enc)
+    print(affineCipherDecrypt(enc,keyA,keyB))
