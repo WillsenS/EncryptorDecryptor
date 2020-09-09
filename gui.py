@@ -4,6 +4,7 @@ import tkinter.ttk
 from collections import defaultdict
 import string
 import random
+import numpy as np
 import Tucil1 as Kripto
 
 
@@ -272,6 +273,97 @@ class AffineKey(VigenereKey):
         return ok
 
 
+class HillKey(VigenereKey):
+    def __init__(self, current_key, key_callback, master=None):
+        super().__init__('Hill Key', None, key_callback,
+                         master)
+        if current_key is not None:
+            self.key = current_key
+            self.set_tbl(self.textlify(self.key))
+            self.check() # also sets key
+        else:
+            self.key = None
+
+    def create_widgets(self, title):
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        # Row 0
+        tk.Label(self, text=title).grid(columnspan=2)
+        # Row 1
+        tk.Label(self, text='Matrix').grid(columnspan=2)
+        # Row 2
+        tbltxt = tk.Text(self, width=5, height=5)
+        tbltxt.grid(columnspan=2, sticky=NSEW)
+        self.tbltxt = tbltxt
+        # Row 3
+        tk.Label(self, text='Dimension').grid()
+        self.dimvar = tk.StringVar()
+        tk.Entry(self, textvariable=self.dimvar, state='readonly')\
+            .grid(row=3, column=1)
+        # Row 4
+        checklbl = tk.Label(self)
+        checklbl.grid(columnspan=2)
+        self.checklbl = checklbl
+        # Row 5
+        check = tk.Button(self, text='Check', command=self.check)
+        check.grid()
+        ok = tk.Button(self, text='Ok', command=self.submit, state='disabled')
+        ok.bind('<KeyPress-Return>', self.enter)
+        ok.grid(row=5, column=1)
+        self.ok = ok
+        self.check()
+
+    def textlify(self, tbl):
+        return '\n'.join(' '.join(map(str, r)) for r in tbl)
+
+    def set_tbl(self, tbl):
+        self.tbltxt.delete('1.0', 'end')
+        self.tbltxt.insert('end', tbl)
+
+    def check(self):
+        def checkme(tbl):
+            if len(tbl) < 1:
+                self.checklbl.configure(text='Please enter a square matrix')
+                return False
+            if not all(c in (string.digits + ' \n') for c in tbl):
+                self.checklbl.configure(text='Only digits and spaces allowed')
+                return False
+            # Check table
+            rows = [r.split() for r in tbl.splitlines()]
+            dim = len(rows)
+            self.dimvar.set(str(dim))
+            if not all(len(r) == dim for r in rows):
+                self.checklbl.configure(text='Matrix must be square')
+                return False
+            try:
+                parsed_tbl = [[int(x) for x in r] for r in rows]
+            except ValueError:
+                self.checklbl.configure(text='Numbers not understood')
+                return False
+            mat = np.array(parsed_tbl)
+            assert mat.shape[0] == mat.shape[1]
+            det = np.around(np.linalg.det(mat))
+            if det == 0:
+                self.checklbl.configure(text='Matrix is singular')
+                return False
+            try:
+                inv_det = Kripto.modInverse(det, 26)
+            except Exception:
+                self.checklbl.configure(text='Determinant is not invertible')
+                return False
+            self.checklbl.configure(text='Key OK')
+            valid_tbl = self.textlify(mat)
+            if tbl != valid_tbl:
+                self.set_tbl(valid_tbl)
+            self.key = mat
+            return True
+        tbl = self.tbltxt.get('1.0', 'end').strip()
+        ok = checkme(tbl)
+        self.ok.configure(state='normal' if ok else 'disabled')
+        return ok
+
+
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -405,6 +497,8 @@ class Application(tk.Frame):
             VigenereKey('Superencryption Key', current, use_key, window)
         elif algo == 'a':
             AffineKey(current, use_key, window)
+        elif algo == 'h':
+            HillKey(current, use_key, window)
         else:
             window.destroy()
             tk.simpledialog.messagebox.showerror(
@@ -441,6 +535,9 @@ class Application(tk.Frame):
         elif algo == 'a':
             cipher = Kripto.affineCipherEncrypt(plain, key[0], key[1])
             if ungroup: cipher = ''.join(cipher.split())
+        elif algo == 'h':
+            cipher = Kripto.hillCipherEncrypt(plain, key.shape[0], key)
+            if ungroup: cipher = ''.join(cipher.split())
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
@@ -465,6 +562,11 @@ class Application(tk.Frame):
         elif algo == 've':
             plain = Kripto.ExtendedVigenereDecrypt(cipher, key)
         elif algo == 'p':
+            if len(cipher) % m != 2:
+                tk.simpledialog.messagebox.showerror(
+                    'Invalid ciphertext',
+                    'Ciphertext length must be a multiple of 2')
+                return
             ptbl = Kripto.playfairTable('', key)
             plain = Kripto.PlayfairDecrypt(ptbl,
                                            Kripto.ArrangeText(cipher.lower()))
@@ -472,6 +574,14 @@ class Application(tk.Frame):
             plain = Kripto.SuperDecrypt(cipher, key)
         elif algo == 'a':
             plain = Kripto.affineCipherDecrypt(cipher, key[0], key[1])
+        elif algo == 'h':
+            m = key.shape[0]
+            if len(cipher) % m != 0:
+                tk.simpledialog.messagebox.showerror(
+                    'Invalid ciphertext',
+                    'Ciphertext length must be a multiple of {}.'.format(m))
+                return
+            plain = Kripto.hillCipherDecrypt(cipher, m, key)
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
