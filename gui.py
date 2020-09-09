@@ -229,16 +229,21 @@ class Application(tk.Frame):
         # Row 3
         container = tk.Frame(self)
         container.grid(columnspan=2, sticky=NSEW)
-        for i in range(3):
+        for i in range(4):
             container.columnconfigure(i, weight=1)
         encrypt = tk.Button(container, text='\u2193 Encrypt!',
                                  command=self.encrypt)
-        encrypt.grid(row=0, column=0)
+        encrypt.grid(row=0, column=1)
+        self.group_chars = tk.StringVar()
+        self.group_chars.set('0')
+        groupck = tk.Checkbutton(container, text='Group output',
+                                 variable=self.group_chars)
+        groupck.grid(row=0, column=0)
         decrypt = tk.Button(container, text='\u2191 Decrypt!',
                                  command=self.decrypt)
-        decrypt.grid(row=0, column=1)
+        decrypt.grid(row=0, column=2)
         clear = tk.Button(container, text='Clear!', command=self.clear)
-        clear.grid(row=0, column=2)
+        clear.grid(row=0, column=3)
         # Row 4
         tk.Label(self, text='Ciphertext').grid(columnspan=3)
         # Rows 5-6
@@ -328,6 +333,7 @@ class Application(tk.Frame):
     def encrypt(self):
         algo = self.algo_selection.get()
         key = self.keys[algo]
+        group = self.group_chars.get() == '1'
         if key is None:
             tk.simpledialog.messagebox.showinfo(
                 'No key', 'Please set the key first')
@@ -335,10 +341,13 @@ class Application(tk.Frame):
         plain = self.get_plain()
         if algo == 'vs':
             cipher = Kripto.VigenereEncrypt(plain, key)
+            if group: cipher = ''.join(cipher.split())
         elif algo == 'vf':
             cipher = Kripto.FullVigenereC(plain, key[0], key[1])
+            if group: cipher = ''.join(cipher.split())
         elif algo == 'va':
             cipher = Kripto.AutoKeyVigenereEncrypt(plain, key)
+            if group: cipher = ''.join(cipher.split())
         elif algo == 've':
             cipher = Kripto.ExtendedVigenereEncrypt(plain, key)
         else:
