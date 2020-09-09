@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.simpledialog
+import tkinter.ttk
 from collections import defaultdict
 import string
 import random
@@ -197,6 +198,79 @@ class FullVigenereKey(VigenereKey):
         return ok
 
 
+class AffineKey(VigenereKey):
+    # Integers coprime to 26
+    VALID_M = [1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]
+
+    def __init__(self, current_key, key_callback, master=None):
+        super().__init__('Affine Key', None, key_callback,
+                         master)
+        if current_key is not None:
+            m, b = current_key
+            self.mcbb.set(str(m))
+            self.bvar.set(str(b))
+            self.check()
+        else:
+            alphakey, tbl = None, None
+            self.key = (None, None)
+
+    def create_widgets(self, title):
+        # Row 0
+        tk.Label(self, text=title).grid(columnspan=2)
+        # Row 1
+        tk.Label(self, text='m').grid()
+        tk.Label(self, text='b').grid(row=1, column=1)
+        # Row 2
+        mcbb = tk.ttk.Combobox(self, values=self.VALID_M)
+        mcbb.bind('<KeyPress-Return>', self.enter)
+        mcbb.grid(sticky=NSEW)
+        mcbb.focus()
+        self.mcbb = mcbb
+        self.bvar = tk.StringVar()
+        btxt = tk.Spinbox(self, textvariable=self.bvar, to=25, increment=1)
+        btxt['from'] = 0
+        btxt.bind('<KeyPress-Return>', self.enter)
+        btxt.grid(row=2, column=1)
+        # Row 3
+        checklbl = tk.Label(self)
+        checklbl.grid(columnspan=2)
+        self.checklbl = checklbl
+        # Row 4
+        check = tk.Button(self, text='Check', command=self.check)
+        check.grid()
+        ok = tk.Button(self, text='Ok', command=self.submit, state='disabled')
+        ok.bind('<KeyPress-Return>', self.enter)
+        ok.grid(row=4, column=1)
+        self.ok = ok
+        btxt.configure(validate='focus', validatecommand=self.check)
+        self.check()
+
+    def check(self):
+        def checkme(mstr, bstr):
+            if len(mstr) < 1 or len(bstr) < 1:
+                self.checklbl.configure(text='Please enter both values')
+                return False
+            try:
+                m = int(mstr)
+                b = int(bstr)
+            except ValueError:
+                self.checklbl.configure(text='Only digits 0-9 allowed')
+                return False
+            if m not in self.VALID_M:
+                self.checklbl.configure(text='m must be coprime to 26')
+                return False
+            b = b % 26
+            self.bvar.set(b)
+            self.checklbl.configure(text='Key OK')
+            self.key = (m, b)
+            return True
+        mstr = self.mcbb.get()
+        bstr = self.bvar.get()
+        ok = checkme(mstr, bstr)
+        self.ok.configure(state='normal' if ok else 'disabled')
+        return ok
+
+
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -328,6 +402,8 @@ class Application(tk.Frame):
             VigenereKey('Playfair Key', current, use_key, window)
         elif algo == 's':
             VigenereKey('Superencryption Key', current, use_key, window)
+        elif algo == 'a':
+            AffineKey(current, use_key, window)
         else:
             window.destroy()
             tk.simpledialog.messagebox.showerror(
@@ -361,6 +437,9 @@ class Application(tk.Frame):
         elif algo == 's':
             cipher = Kripto.SuperEncrypt(plain, key)
             if ungroup: cipher = ''.join(cipher.split())
+        elif algo == 'a':
+            cipher = Kripto.affineCipherEncrypt(plain, key[0], key[1])
+            if ungroup: cipher = ''.join(cipher.split())
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
@@ -390,6 +469,8 @@ class Application(tk.Frame):
                                            Kripto.ArrangeText(cipher.lower()))
         elif algo == 's':
             plain = Kripto.SuperDecrypt(cipher, key)
+        elif algo == 'a':
+            plain = Kripto.affineCipherDecrypt(cipher, key[0], key[1])
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
