@@ -114,6 +114,11 @@ class Application(tk.Frame):
     def save_cipher(self): pass
 
 
-app = Application()
-app.master.title('Encryptor/Decryptor')
-app.mainloop()
+def main():
+    app = Application()
+    app.master.title('Encryptor/Decryptor')
+    app.mainloop()
+
+
+if __name__ == '__main__':
+    main()
