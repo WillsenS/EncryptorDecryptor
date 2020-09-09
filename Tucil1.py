@@ -424,7 +424,7 @@ def hillCipherDecrypt(text,m,table):
         encTable = npTable.dot(npCharList)
         for k in range(m):
             Decrypted += chr((int(encTable[k]) % 26) + 97)
-    return Decrypted
+    return Decrypted.rstrip('x')
 
             
 #************** MAIN PROGRAM *********************
