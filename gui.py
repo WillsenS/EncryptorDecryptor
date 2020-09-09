@@ -450,7 +450,7 @@ class Application(tk.Frame):
         tk.Radiobutton(algoframe, variable=self.algo_selection, value='h',
                        text='Hill Cipher').grid(sticky=tk.W)
         tk.Radiobutton(algoframe, variable=self.algo_selection, value='e',
-                       text='Enigma M4').grid(sticky=tk.W)
+                       text='Enigma M4', state='disabled').grid(sticky=tk.W)
         setkey = tk.Button(algoframe, text='Set key', command=self.set_key)
         setkey.grid()
 
