@@ -53,13 +53,13 @@ def VigenereDecrypt(text,key):
 def ExtendedVigenereEncrypt(text,key):
     encrypted = ""
     for i in range(len(text)):
-        encrypted += chr(((ord(text[i])) + (ord(key[(i % len(key))]))))
+        encrypted += chr(((ord(text[i])) + (ord(key[(i % len(key))]))) % 256)
     return encrypted
 
 def ExtendedVigenereDecrypt(text,key):
     decrypted = ""
     for i in range(len(text)):
-        decrypted += chr(((ord(text[i])) - (ord(key[(i % len(key))]))))
+        decrypted += chr(((ord(text[i])) - (ord(key[(i % len(key))]))) % 256)
     return decrypted
 
 #************** AUTOKEY VIGENERE ***************************
