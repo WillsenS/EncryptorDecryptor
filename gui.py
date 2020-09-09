@@ -461,21 +461,32 @@ class Application(tk.Frame):
         self.cipherbox.delete('1.0', 'end')
         self.cipherbox.edit('reset')
 
+    # Tk cannot handle embedded NULLs, so we encode it as an extra-ASCII char
+    @staticmethod
+    def encode_bytes_for_display(data):
+        return data.replace('\0', '\u2400')
+
+    @staticmethod
+    def decode_bytes_from_display(data):
+        return data.replace('\u2400', '\0')
+
     def set_plain(self, plain):
         self.plainbox.delete('1.0', 'end')
-        self.plainbox.insert('end', plain)
+        self.plainbox.insert('end', self.encode_bytes_for_display(plain))
         self.plainbox.edit('reset')
 
     def get_plain(self):
-        return self.plainbox.get('1.0', 'end')[:-1] # skip last line ending
+        txt = self.plainbox.get('1.0', 'end')
+        return self.decode_bytes_from_display(txt[:-1]) # skip last line ending
 
     def set_cipher(self, cipher):
         self.cipherbox.delete('1.0', 'end')
-        self.cipherbox.insert('end', cipher)
+        self.cipherbox.insert('end', self.encode_bytes_for_display(cipher))
         self.cipherbox.edit('reset')
 
     def get_cipher(self):
-        return self.cipherbox.get('1.0', 'end')[:-1] # skip last line ending
+        txt = self.cipherbox.get('1.0', 'end')
+        return self.decode_bytes_from_display(txt[:-1]) # skip last line ending
 
     def set_key(self):
         window = tk.Toplevel(self)
