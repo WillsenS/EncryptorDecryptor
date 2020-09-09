@@ -574,7 +574,7 @@ class Application(tk.Frame):
         elif algo == 've':
             plain = Kripto.ExtendedVigenereDecrypt(cipher, key)
         elif algo == 'p':
-            if len(cipher) % m != 2:
+            if len(cipher) % 2 != 0:
                 tk.simpledialog.messagebox.showerror(
                     'Invalid ciphertext',
                     'Ciphertext length must be a multiple of 2')
