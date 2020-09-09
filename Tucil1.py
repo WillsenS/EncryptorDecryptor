@@ -220,13 +220,11 @@ def PlayfairDecrypt(table,text):
         pos2 = findPosition(table,bigram[i*2 + 1])
         if pos1[0] == pos2[0]:
             temp = table[pos1[0]][(pos1[1] + 4) % 5] + table[pos2[0]][(pos2[1] + 4) % 5]
-            NewBigram.append(temp)
         elif pos1[1] == pos2[1]:
             temp = table[(pos1[0] + 4) % 5][pos1[1]] + table[(pos2[0] + 4) % 5][pos2[1]]
-            NewBigram.append(temp)
         else:
             temp = table[(pos1[0])][pos2[1]] + table[(pos2[0])][pos1[1]]
-            NewBigram.append(temp)
+        NewBigram.append(temp.rstrip('X'))
     decrypt = ""
     decrypt = decrypt.join(NewBigram)
     decrypt = decrypt.rstrip("X")
