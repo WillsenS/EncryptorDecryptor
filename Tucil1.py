@@ -213,7 +213,7 @@ def PlayfairEncrypt(table,bigram):
 # output: text
 def PlayfairDecrypt(table,text):
     bigram = ""
-    bigram = bigram.join(text)
+    bigram = bigram.join(text).upper()
     NewBigram = []
     for i in range(len(bigram) // 2):
         pos1 = findPosition(table,bigram[i*2])
@@ -229,7 +229,7 @@ def PlayfairDecrypt(table,text):
             NewBigram.append(temp)
     decrypt = ""
     decrypt = decrypt.join(NewBigram)
-    decrypt = decrypt.replace("X","")
+    decrypt = decrypt.rstrip("X")
     return(decrypt.lower())
 
 # Mengenerate playfair table
