@@ -427,84 +427,87 @@ def hillCipherDecrypt(text,m,table):
         for k in range(m):
             Decrypted += chr((int(encTable[k]) % 26) + 97)
     return Decrypted
-        
-        
+
             
-
 #************** MAIN PROGRAM *********************
+def main():
 
-print("Welcome to encryptor")
-print("masukkan pilihan :")
-print("1. basic vigenere")
-print("2. full vigenere")
-print("3. Auto key vigenere")
-print("4. Extended vigenere")
-print("5. Playfair vigenere")
-print("6. Super Encryption")
-print("7. Affine")
-print("8. Hill")
-pilihan = input("pilihan anda: ")
+    print("Welcome to encryptor")
+    print("masukkan pilihan :")
+    print("1. basic vigenere")
+    print("2. full vigenere")
+    print("3. Auto key vigenere")
+    print("4. Extended vigenere")
+    print("5. Playfair vigenere")
+    print("6. Super Encryption")
+    print("7. Affine")
+    print("8. Hill")
+    pilihan = input("pilihan anda: ")
 
-if (pilihan == "1"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    enc = VigenereEncrypt(text,key)
-    enc = ArrangeEncription(enc)
-    print("Terenkripsi : " + enc)
-    print(VigenereDecrypt(enc,key))
+    if (pilihan == "1"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        enc = VigenereEncrypt(text,key)
+        enc = ArrangeEncription(enc)
+        print("Terenkripsi : " + enc)
+        print(VigenereDecrypt(enc,key))
 
-if (pilihan == "2"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    table = RNDTableGenerator()
-    enc = FullVigenereC(text,key,table)
-    print("Terenkripsi : " + enc)
-    print(FullVigenereDecrypt(enc,key,table))
+    if (pilihan == "2"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        table = RNDTableGenerator()
+        enc = FullVigenereC(text,key,table)
+        print("Terenkripsi : " + enc)
+        print(FullVigenereDecrypt(enc,key,table))
 
-if (pilihan == "3"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    enc = AutoKeyVigenereEncrypt(text,key)
-    print("Terenkripsi : " + enc)
-    print("Dekripsi : " + AutoKeyVigenereDecrypt(enc,key))
+    if (pilihan == "3"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        enc = AutoKeyVigenereEncrypt(text,key)
+        print("Terenkripsi : " + enc)
+        print("Dekripsi : " + AutoKeyVigenereDecrypt(enc,key))
 
-if (pilihan == "4"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    print("Terenkripsi : " + ExtendedVigenereEncrypt(text,key))
+    if (pilihan == "4"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        print("Terenkripsi : " + ExtendedVigenereEncrypt(text,key))
 
-if (pilihan == "5"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    table = playfairTable(text,key)
-    print("encrypted : " ,end ="")
-    print(PlayfairC(table,text,key))
-    print(PlayfairDecrypt(table, PlayfairC(table,text,key)))
+    if (pilihan == "5"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        table = playfairTable(text,key)
+        print("encrypted : " ,end ="")
+        print(PlayfairC(table,text,key))
+        print(PlayfairDecrypt(table, PlayfairC(table,text,key)))
 
-if (pilihan == "6"):
-    text = input("Masukan Teks: ")
-    key = input("Masukkan Key: ")
-    enc = SuperEncrypt(text,key)
-    print(enc)
-    print(SuperDecrypt(enc,key))
+    if (pilihan == "6"):
+        text = input("Masukan Teks: ")
+        key = input("Masukkan Key: ")
+        enc = SuperEncrypt(text,key)
+        print(enc)
+        print(SuperDecrypt(enc,key))
 
-if (pilihan == "7"):
-    text = input("Masukan Teks: ")
-    checkKey = False
-    while not(checkKey):
-        keyA = int(input("Masukkan Key integer yang koprima dengan 26: "))
-        if checkCoprime(keyA,26):
-            checkKey = True
-        else:
-            print("tidak koprima!")
-    keyB = int(input("Masukkan Key integer ke 2: "))
-    enc = affineCipherEncrypt(text,keyA,keyB)
-    print(enc)
-    print(affineCipherDecrypt(enc,keyA,keyB))
+    if (pilihan == "7"):
+        text = input("Masukan Teks: ")
+        checkKey = False
+        while not(checkKey):
+            keyA = int(input("Masukkan Key integer yang koprima dengan 26: "))
+            if checkCoprime(keyA,26):
+                checkKey = True
+            else:
+                print("tidak koprima!")
+        keyB = int(input("Masukkan Key integer ke 2: "))
+        enc = affineCipherEncrypt(text,keyA,keyB)
+        print(enc)
+        print(affineCipherDecrypt(enc,keyA,keyB))
 
-if (pilihan == "8"):
-    text = input("Masukan Teks: ")
-    m = input("dimensi: " )
-    table = inputMatrixKey(int(m))
-    enc = hillCipherEncrypt(text,m,table)
-    print(enc)
+    if (pilihan == "8"):
+        text = input("Masukan Teks: ")
+        m = input("dimensi: " )
+        table = inputMatrixKey(int(m))
+        enc = hillCipherEncrypt(text,m,table)
+        print(enc)
+
+
+if __name__ == '__main__':
+    main()
