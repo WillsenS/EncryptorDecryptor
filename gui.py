@@ -1,22 +1,104 @@
 import tkinter as tk
+from collections import defaultdict
+import string
 
 
 NSEW = tk.N + tk.S + tk.E + tk.W
 
 
-class KeyFrame(tk.Frame): pass
+class VigenereKey(tk.Frame):
+    def __init__(self, title, current_key, key_callback, master=None):
+        super().__init__(master)
+        self.grid(sticky=NSEW)
+        top = self.winfo_toplevel()
+        top.rowconfigure(0, weight=1)
+        top.columnconfigure(0, weight=1)
+        self.create_widgets(title)
+        if current_key is not None:
+            self.keyvar.set(current_key)
+        self.key = current_key
+        self.key_callback = key_callback
+
+    def create_widgets(self, title):
+        # Row 0
+        tk.Label(self, text=title).grid(columnspan=2)
+        # Row 1
+        self.keyvar = tk.StringVar()
+        keytxt = tk.Entry(self, textvariable=self.keyvar, validate='focus',
+                          validatecommand=self.check)
+        keytxt.bind('<KeyPress-Return>', self.enter)
+        keytxt.grid(columnspan=2)
+        keytxt.focus()
+        # Row 2
+        checklbl = tk.Label(self)
+        checklbl.grid(columnspan=2)
+        self.checklbl = checklbl
+        # Row 3
+        check = tk.Button(self, text='Check', command=self.check)
+        check.grid()
+        ok = tk.Button(self, text='Ok', command=self.submit, state='disabled')
+        ok.bind('<KeyPress-Return>', self.enter)
+        ok.grid(row=3, column=1)
+        self.ok = ok
+        self.check()
+
+    def check(self):
+        #print('checking', self.keyvar.get())
+        key = self.keyvar.get()
+        ok = False
+        if len(key) < 1:
+            self.checklbl.configure(text='Minimum 1 letter')
+        elif not all(c in string.ascii_letters for c in key):
+            self.checklbl.configure(text='Only letters A-Z allowed')
+        else:
+            self.checklbl.configure(text='Key OK')
+            ok = True
+            self.key = key
+        self.ok.configure(state='normal' if ok else 'disabled')
+        return ok
+
+    def enter(self, event):
+        self.submit()
+
+    def submit(self):
+        if self.check():
+            self.key_callback(self.key)
+            self.master.destroy()
+
+
+class ExtendedVigenereKey(VigenereKey):
+    def __init__(self, current_key, key_callback, master=None):
+        super().__init__('Extended Vigen\xe8re Key', current_key, key_callback,
+                         master)
+
+    def check(self):
+        #print('checking', self.keyvar.get())
+        key = self.keyvar.get()
+        ok = False
+        if len(key) < 1:
+            self.checklbl.configure(text='Minimum 1 character')
+        elif not all(0 <= ord(c) <= 255 for c in key):
+            self.checklbl.configure(text='Only latin1 characters allowed')
+        else:
+            self.checklbl.configure(text='Key OK')
+            ok = True
+            self.key = key
+        self.ok.configure(state='normal' if ok else 'disabled')
+        return ok
 
 
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.grid(sticky=NSEW)
-        self.createWidgets()
-
-    def createWidgets(self):
         top = self.winfo_toplevel()
         top.rowconfigure(0, weight=1)
         top.columnconfigure(0, weight=1)
+        self.create_widgets()
+        self.plainbox.focus()
+        self.keys = defaultdict(lambda: None)
+
+    def create_widgets(self):
         self.columnconfigure(0, weight=1)
         # Row 0
         tk.Label(self, text='Plaintext').grid(columnspan=3)
@@ -96,7 +178,19 @@ class Application(tk.Frame):
         self.cipherbox.delete('1.0', 'end')
         self.cipherbox.edit('reset')
 
-    def set_key(self): pass
+    def set_key(self):
+        window = tk.Toplevel(self)
+        algo = self.algo_selection.get()
+        def use_key(key):
+            self.keys[algo] = key
+            #print(algo, key)
+        current = self.keys[algo]
+        if algo == 'vs' or algo == 'va':
+            keywin = VigenereKey(('Autokey ' if algo == 'va' else '')
+                                 + 'Vigen\xe8re Key',
+                                 current, use_key, window)
+        elif algo == 've':
+            keywin = ExtendedVigenereKey(current, use_key, window)
 
     def encrypt(self):
         print(self.algo_selection.get())
