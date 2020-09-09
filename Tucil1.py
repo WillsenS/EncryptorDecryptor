@@ -410,36 +410,30 @@ def hillCipherEncrypt(text,m,table):
     return ArrangeEncription(Encrypted)
 
 #Hill Decrypt
-# def hillCipherDecrypt(text,m,table):
-#     text = ArrangeText(text.lower())
-#     m = int(m)
-#     sub = len(text) % m
-#     if (sub) == 0:
-#         pass
-#     else:
-#         for i in range (sub):
-#             text += "x"
-#     npTable = np.array(table)
-#     npTable = np.linalg.inv(npTable)
-#     found = False
-#     z = 1
-#     while not(found):
-#         if ((npTable[0][0] % 26 == 1) and (npTable[1][1] % 26 == 1) and (npTable[0][1] % 26 == 0) and (npTable[1][0] % 26 == 0)) :
-#             found = True
-#         else:
-#             npTable = z * npTable
-#             z += 1
-#     Decrypted = ""
-#     for i in range(len(text) // m):
-#         charlist = []
-#         for j in range(m):
-#             charlist.append(ord(text[i*m + j]) - 97)
-#         npCharList = np.array(charlist)
-#         encTable = npTable.dot(npCharList)
-#         for k in range(m):
-#             Decrypted += chr((int(encTable[k]) % 26) + 97)
-#     Decrypted = Decrypted[:len(Decrypted)-sub]
-#     return Decrypted
+def hillCipherDecrypt(text,m,table):
+    text = ArrangeText(text.lower())
+    m = int(m)
+    sub = len(text) % m
+    if (sub) == 0:
+        pass
+    else:
+        for i in range (sub):
+            text += "x"
+    npTable = np.array(table)
+    det = np.around(np.linalg.det(npTable))
+    inv_det = modInverse(det, 26)
+    npTable = inv_det * np.around(det * np.linalg.inv(npTable))
+    Decrypted = ""
+    for i in range(len(text) // m):
+        charlist = []
+        for j in range(m):
+            charlist.append(ord(text[i*m + j]) - 97)
+        npCharList = np.array(charlist)
+        encTable = npTable.dot(npCharList)
+        for k in range(m):
+            Decrypted += chr((int(encTable[k]) % 26) + 97)
+    Decrypted = Decrypted[:len(Decrypted)-sub]
+    return Decrypted
         
         
             
