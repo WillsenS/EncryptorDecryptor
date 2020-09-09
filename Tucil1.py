@@ -391,9 +391,7 @@ def hillCipherEncrypt(text,m,table):
     text = ArrangeText(text.lower())
     m = int(m)
     sub = len(text) % m
-    if (sub) == 0:
-        pass
-    else:
+    if sub != 0:
         for i in range (sub):
             text += "x"
     npTable = np.array(table)
@@ -406,7 +404,6 @@ def hillCipherEncrypt(text,m,table):
         encTable = npTable.dot(npCharList)
         for k in range(m):
             Encrypted += chr((encTable[k] % 26) + 97)
-    Encrypted = Encrypted[:len(Encrypted)-sub]
     return ArrangeEncription(Encrypted)
 
 #Hill Decrypt
@@ -414,11 +411,8 @@ def hillCipherDecrypt(text,m,table):
     text = ArrangeText(text.lower())
     m = int(m)
     sub = len(text) % m
-    if (sub) == 0:
-        pass
-    else:
-        for i in range (sub):
-            text += "x"
+    if sub != 0:
+        raise ValueError('input length must be a multiple of m')
     npTable = np.array(table)
     det = np.around(np.linalg.det(npTable))
     inv_det = modInverse(det, 26)
@@ -432,7 +426,6 @@ def hillCipherDecrypt(text,m,table):
         encTable = npTable.dot(npCharList)
         for k in range(m):
             Decrypted += chr((int(encTable[k]) % 26) + 97)
-    Decrypted = Decrypted[:len(Decrypted)-sub]
     return Decrypted
         
         
