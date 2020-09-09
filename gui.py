@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.simpledialog
+import tkinter.filedialog
 import tkinter.ttk
 from collections import defaultdict
 import string
@@ -589,10 +590,28 @@ class Application(tk.Frame):
             return
         self.set_plain(plain)
 
-    def load_plain(self): pass
-    def save_plain(self): pass
-    def load_cipher(self): pass
-    def save_cipher(self): pass
+    def load_plain(self):
+        self.set_plain(self.load_file())
+
+    def save_plain(self):
+        self.save_file(self.get_plain())
+
+    def load_cipher(self):
+        self.set_cipher(self.load_file())
+
+    def save_cipher(self):
+        self.save_file(self.get_cipher())
+
+    def load_file(self):
+        f = tk.filedialog.askopenfile(mode='rb', parent=self)
+        data = f.read().decode('latin1')
+        f.close()
+        return data
+
+    def save_file(self, data):
+        f = tk.filedialog.asksaveasfile(mode='wb', parent=self)
+        f.write(data.encode('latin1'))
+        f.close()
 
 
 def main():
