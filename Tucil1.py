@@ -317,16 +317,25 @@ def SuperDecrypt(text,key):
 
 #************** AFFINE CIPHER ********************
 
+# Extended Euclidean algorithm
+# input: a, b : int
+# output: g, x, y : int sehingga g = gcd(a, b) = ax + by
+def egcd(a, b):
+    xb, yb, x, y = 1, 0, 0, 1
+    g, r = a, b
+    while r:
+        q = g // r
+        g, r = r, g % r
+        xb, x = x, xb - q * x
+        yb, y = y, yb - q * y
+    assert (a * xb + b * yb) == g
+    return g, xb, yb
+
 # Check if a is coprime to b
 # return boolean
 def checkCoprime (a,b):
-    if (a % 2) == 0 :
-        return False
-    else :
-        if (b % a) == 0 :
-            return False
-        else:
-            return True
+    g, _, _ = egcd(a, b)
+    return g == 1
 
 # Affine Encryption
 # Input: String, integer(coprime dengan 26), integer
@@ -338,18 +347,18 @@ def affineCipherEncrypt (text,m,b):
         Encrypted += chr(( (m * (ord(i) - 97) + b) % 26) + 97)
     return ArrangeEncription(Encrypted)
 
-# mencari modulus multiplication inverse
+# mencari multiplication inverse dari a modulo n
 # input: int, int
 # output: int
-def modInverse(a,b):
-    i = 1
-    found = False
-    while not(found):
-        if (a*i) % b == 1:
-           found = True
-        else:
-            i += 1
-    return i
+def modInverse(a, n):
+    g, x, _ = egcd(a, n)
+    if g == 1:
+        if x < 0: x += n
+        assert 0 < x < n
+        assert ((x * a) % n) == 1
+        return x
+    else:
+        raise Exception('integer is not invertible')
 
 # Dekripsi Affine
 # input: string text, int key(coprime dengan 26), int key
