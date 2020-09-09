@@ -203,8 +203,7 @@ class AffineKey(VigenereKey):
     VALID_M = [1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]
 
     def __init__(self, current_key, key_callback, master=None):
-        super().__init__('Affine Key', None, key_callback,
-                         master)
+        super().__init__('Affine Key', None, key_callback, master)
         if current_key is not None:
             m, b = current_key
             self.mcbb.set(str(m))
@@ -256,11 +255,13 @@ class AffineKey(VigenereKey):
             except ValueError:
                 self.checklbl.configure(text='Only digits 0-9 allowed')
                 return False
+            m = m % 26
+            b = b % 26
             if m not in self.VALID_M:
                 self.checklbl.configure(text='m must be coprime to 26')
                 return False
-            b = b % 26
-            self.bvar.set(b)
+            self.mcbb.set(str(m))
+            self.bvar.set(str(b))
             self.checklbl.configure(text='Key OK')
             self.key = (m, b)
             return True
