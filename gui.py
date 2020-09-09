@@ -1,6 +1,9 @@
 import tkinter as tk
+import tkinter.simpledialog
 from collections import defaultdict
 import string
+import random
+import Tucil1 as Kripto
 
 
 NSEW = tk.N + tk.S + tk.E + tk.W
@@ -24,10 +27,9 @@ class VigenereKey(tk.Frame):
         tk.Label(self, text=title).grid(columnspan=2)
         # Row 1
         self.keyvar = tk.StringVar()
-        keytxt = tk.Entry(self, textvariable=self.keyvar, validate='focus',
-                          validatecommand=self.check)
+        keytxt = tk.Entry(self, textvariable=self.keyvar)
         keytxt.bind('<KeyPress-Return>', self.enter)
-        keytxt.grid(columnspan=2)
+        keytxt.grid(columnspan=2, sticky=NSEW)
         keytxt.focus()
         # Row 2
         checklbl = tk.Label(self)
@@ -40,6 +42,7 @@ class VigenereKey(tk.Frame):
         ok.bind('<KeyPress-Return>', self.enter)
         ok.grid(row=3, column=1)
         self.ok = ok
+        keytxt.configure(validate='focus', validatecommand=self.check)
         self.check()
 
     def check(self):
@@ -52,6 +55,8 @@ class VigenereKey(tk.Frame):
             self.checklbl.configure(text='Only letters A-Z allowed')
         else:
             self.checklbl.configure(text='Key OK')
+            key = key.upper()
+            self.keyvar.set(key)
             ok = True
             self.key = key
         self.ok.configure(state='normal' if ok else 'disabled')
@@ -83,6 +88,111 @@ class ExtendedVigenereKey(VigenereKey):
             self.checklbl.configure(text='Key OK')
             ok = True
             self.key = key
+        self.ok.configure(state='normal' if ok else 'disabled')
+        return ok
+
+
+class FullVigenereKey(VigenereKey):
+    def __init__(self, current_key, key_callback, master=None):
+        super().__init__('Full Vigen\xe8re Key', None, key_callback,
+                         master)
+        if current_key is not None:
+            alphakey, tbl = current_key
+            self.keyvar.set(alphakey)
+            self.set_tbl('\n'.join(''.join(r) for r in tbl))
+            self.check() # also sets key
+        else:
+            alphakey, tbl = None, None
+            self.key = (None, None)
+
+    def create_widgets(self, title):
+        # Row 0
+        tk.Label(self, text=title).grid(columnspan=2)
+        # Row 1
+        self.keyvar = tk.StringVar()
+        keytxt = tk.Entry(self, textvariable=self.keyvar)
+        keytxt.bind('<KeyPress-Return>', self.enter)
+        keytxt.grid(columnspan=2, sticky=NSEW)
+        keytxt.focus()
+        # Row 2
+        tk.Label(self, text='Tabula Recta').grid(columnspan=2)
+        # Row 3
+        std = tk.Button(self, text='Generate standard', command=self.gen_std)
+        std.grid()
+        rnd = tk.Button(self, text='Generate random', command=self.gen_rnd)
+        rnd.grid(row=3, column=1)
+        # Row 4
+        tbltxt = tk.Text(self, width=26, height=26)
+        tbltxt.grid(columnspan=2)
+        self.tbltxt = tbltxt
+        # Row 5
+        checklbl = tk.Label(self)
+        checklbl.grid(columnspan=2)
+        self.checklbl = checklbl
+        # Row 6
+        check = tk.Button(self, text='Check', command=self.check)
+        check.grid()
+        ok = tk.Button(self, text='Ok', command=self.submit, state='disabled')
+        ok.bind('<KeyPress-Return>', self.enter)
+        ok.grid(row=6, column=1)
+        self.ok = ok
+        keytxt.configure(validate='focus', validatecommand=self.check)
+        self.check()
+
+    def set_tbl(self, tbl):
+        self.tbltxt.delete('1.0', 'end')
+        self.tbltxt.insert('end', tbl)
+
+    def gen_std(self):
+        row = string.ascii_uppercase
+        tbl = ''
+        for i in range(26):
+            if i > 0: tbl += '\n'
+            tbl += row
+            row = row[1:] + row[:1]
+        self.set_tbl(tbl)
+
+    def gen_rnd(self):
+        tbl = ''
+        row = list(string.ascii_uppercase)
+        for i in range(26):
+            if i > 0: tbl += '\n'
+            random.shuffle(row)
+            tbl += ''.join(row)
+        self.set_tbl(tbl)
+
+    def check(self):
+        def checkme(alphakey, tbl):
+            if len(alphakey) < 1:
+                self.checklbl.configure(text='Minimum 1 letter')
+                return False
+            if not all(c in string.ascii_letters for c in alphakey):
+                self.checklbl.configure(text='Only letters A-Z allowed')
+                return False
+            # Check table
+            rows = tbl.upper().split()
+            if len(rows) != 26 or not all(len(r) == 26 for r in rows):
+                self.checklbl.configure(text='Table must be 26x26')
+                return False
+            parsed_tbl = [list(r) for r in rows]
+            alphaset = set(string.ascii_uppercase)
+            for row in parsed_tbl:
+                if set(row) != alphaset:
+                    self.checklbl.configure(
+                        text='Each row must be a permutation of A-Z')
+                    return False
+            self.checklbl.configure(text='Key OK')
+            alphakey = alphakey.upper()
+            valid_tbl = '\n'.join(''.join(r) for r in parsed_tbl)
+            if tbl != valid_tbl:
+                self.set_tbl(valid_tbl)
+            self.keyvar.set(alphakey)
+            self.key = (alphakey, parsed_tbl)
+            return True
+        #print('checking', self.keyvar.get())
+        alphakey = self.keyvar.get()
+        tbl = self.tbltxt.get('1.0', 'end')
+        ok = checkme(alphakey, tbl)
         self.ok.configure(state='normal' if ok else 'disabled')
         return ok
 
@@ -178,29 +288,88 @@ class Application(tk.Frame):
         self.cipherbox.delete('1.0', 'end')
         self.cipherbox.edit('reset')
 
+    def set_plain(self, plain):
+        self.plainbox.delete('1.0', 'end')
+        self.plainbox.insert('end', plain)
+        self.plainbox.edit('reset')
+
+    def get_plain(self):
+        return self.plainbox.get('1.0', 'end')[:-1] # skip last line ending
+
+    def set_cipher(self, cipher):
+        self.cipherbox.delete('1.0', 'end')
+        self.cipherbox.insert('end', cipher)
+        self.cipherbox.edit('reset')
+
+    def get_cipher(self):
+        return self.cipherbox.get('1.0', 'end')[:-1] # skip last line ending
+
     def set_key(self):
         window = tk.Toplevel(self)
         algo = self.algo_selection.get()
         def use_key(key):
             self.keys[algo] = key
-            #print(algo, key)
+            print(algo, key)
         current = self.keys[algo]
         if algo == 'vs' or algo == 'va':
-            keywin = VigenereKey(('Autokey ' if algo == 'va' else '')
-                                 + 'Vigen\xe8re Key',
-                                 current, use_key, window)
+            VigenereKey(('Autokey ' if algo == 'va' else '')
+                        + 'Vigen\xe8re Key',
+                        current, use_key, window)
         elif algo == 've':
-            keywin = ExtendedVigenereKey(current, use_key, window)
+            ExtendedVigenereKey(current, use_key, window)
+        elif algo == 'vf':
+            FullVigenereKey(current, use_key, window)
+        else:
+            window.destroy()
+            tk.simpledialog.messagebox.showerror(
+                'Not implemented',
+                'Sorry, this cipher is not implemented yet.')
 
     def encrypt(self):
-        print(self.algo_selection.get())
-        print(repr(self.plainbox.get('1.0', 'end')))
-        self.cipherbox.delete('1.0', 'end')
-        self.cipherbox.insert('end', 'ash nazg durbatuluk')
-        self.cipherbox.edit('reset')
-        print('Conspicuously pretending to encrypt!')
+        algo = self.algo_selection.get()
+        key = self.keys[algo]
+        if key is None:
+            tk.simpledialog.messagebox.showinfo(
+                'No key', 'Please set the key first')
+            return
+        plain = self.get_plain()
+        if algo == 'vs':
+            cipher = Kripto.VigenereEncrypt(plain, key)
+        elif algo == 'vf':
+            cipher = Kripto.FullVigenereC(plain, key[0], key[1])
+        elif algo == 'va':
+            cipher = Kripto.AutoKeyVigenereEncrypt(plain, key)
+        elif algo == 've':
+            cipher = Kripto.ExtendedVigenereEncrypt(plain, key)
+        else:
+            tk.simpledialog.messagebox.showerror(
+                'Not implemented',
+                'Sorry, this cipher is not implemented yet.')
+            return
+        self.set_cipher(cipher)
 
-    def decrypt(self): pass
+    def decrypt(self):
+        algo = self.algo_selection.get()
+        key = self.keys[algo]
+        if key is None:
+            tk.simpledialog.messagebox.showinfo(
+                'No key', 'Please set the key first')
+            return
+        cipher = self.get_cipher()
+        if algo == 'vs':
+            plain = Kripto.VigenereDecrypt(cipher, key)
+        elif algo == 'vf':
+            plain = Kripto.FullVigenereDecrypt(cipher, key[0], key[1])
+        elif algo == 'va':
+            plain = Kripto.AutoKeyVigenereDecrypt(cipher, key)
+        elif algo == 've':
+            plain = Kripto.ExtendedVigenereDecrypt(cipher, key)
+        else:
+            tk.simpledialog.messagebox.showerror(
+                'Not implemented',
+                'Sorry, this cipher is not implemented yet.')
+            return
+        self.set_plain(plain)
 
     def load_plain(self): pass
     def save_plain(self): pass
