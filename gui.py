@@ -324,6 +324,10 @@ class Application(tk.Frame):
             ExtendedVigenereKey(current, use_key, window)
         elif algo == 'vf':
             FullVigenereKey(current, use_key, window)
+        elif algo == 'p':
+            VigenereKey('Playfair Key', current, use_key, window)
+        elif algo == 's':
+            VigenereKey('Superencryption Key', current, use_key, window)
         else:
             window.destroy()
             tk.simpledialog.messagebox.showerror(
@@ -333,7 +337,7 @@ class Application(tk.Frame):
     def encrypt(self):
         algo = self.algo_selection.get()
         key = self.keys[algo]
-        group = self.group_chars.get() == '1'
+        ungroup = self.group_chars.get() == '0'
         if key is None:
             tk.simpledialog.messagebox.showinfo(
                 'No key', 'Please set the key first')
@@ -341,15 +345,22 @@ class Application(tk.Frame):
         plain = self.get_plain()
         if algo == 'vs':
             cipher = Kripto.VigenereEncrypt(plain, key)
-            if group: cipher = ''.join(cipher.split())
+            if ungroup: cipher = ''.join(cipher.split())
         elif algo == 'vf':
             cipher = Kripto.FullVigenereC(plain, key[0], key[1])
-            if group: cipher = ''.join(cipher.split())
+            if ungroup: cipher = ''.join(cipher.split())
         elif algo == 'va':
             cipher = Kripto.AutoKeyVigenereEncrypt(plain, key)
-            if group: cipher = ''.join(cipher.split())
+            if ungroup: cipher = ''.join(cipher.split())
         elif algo == 've':
             cipher = Kripto.ExtendedVigenereEncrypt(plain, key)
+        elif algo == 'p':
+            ptbl = Kripto.playfairTable('', key)
+            cipher = ''.join(Kripto.PlayfairC(ptbl, plain, ''))
+            if not ungroup: cipher = Kripto.ArrangeEncription(cipher)
+        elif algo == 's':
+            cipher = Kripto.SuperEncrypt(plain, key)
+            if ungroup: cipher = ''.join(cipher.split())
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
@@ -373,6 +384,12 @@ class Application(tk.Frame):
             plain = Kripto.AutoKeyVigenereDecrypt(cipher, key)
         elif algo == 've':
             plain = Kripto.ExtendedVigenereDecrypt(cipher, key)
+        elif algo == 'p':
+            ptbl = Kripto.playfairTable('', key)
+            plain = Kripto.PlayfairDecrypt(ptbl,
+                                           Kripto.ArrangeText(cipher.lower()))
+        elif algo == 's':
+            plain = Kripto.SuperDecrypt(cipher, key)
         else:
             tk.simpledialog.messagebox.showerror(
                 'Not implemented',
